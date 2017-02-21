@@ -24,7 +24,7 @@ namespace HuadianWF
 
 
         [WebMethod(Description = "用户deviceId校验")]
-        public string userValidate(string deviceId)
+        public void userValidate(string deviceId)
         {
             SqlConnection conn = new SqlConnection(connstr);
             string sql = "select * from xx_yonghu_cheliangxinxi where sn = '" + deviceId + "'";
@@ -40,20 +40,27 @@ namespace HuadianWF
             data.Fill(ds);
             if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
+                if (ds.Tables[0].Rows[0]["flag"].ToString() == "" || ds.Tables[0].Rows[0]["flag"].ToString() == "未审核") {
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"用户尚未通过审核\"}");
+                    return;
+                }
+                if (ds.Tables[0].Rows[0]["flag"].ToString() == "黑名单")
+                {
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"用户已在黑名单中!请联系管理员\"}");
+                    return;
+                }
                 //deviceId校验成功，返回用户数据
                 string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "司机信息校验成功");
-                return jsonData.ToString();
+                Context.Response.Write(jsonData.ToString());
             }
             else {
                 //deviceId校验失败
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"1001\",\"msg\":\"用户信息校验失败\"}");
-                return strBuilder.ToString();
+                Context.Response.Write("{\"code\":\"1001\",\"msg\":\"用户信息校验失败\"}");
             }
         }
 
         [WebMethod(Description = "用户绑定（sn）")]
-        public string userComplete(string mobile, string sn) {
+        public void userComplete(string mobile, string sn) {
             SqlConnection conn = new SqlConnection(connstr);
 
             string updateSql = "update xx_yonghu_cheliangxinxi set sn = '" + sn + "' where dianhua = '" + mobile + "'";
@@ -62,23 +69,24 @@ namespace HuadianWF
             try
             {
                 conn.Open();
-                command.BeginExecuteNonQuery();
+                int num = Convert.ToInt32(command.ExecuteNonQuery());
+                if (num > 0) {
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"用户绑定成功，等待审核\"}");
+                } else {
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"用户绑定失败\"}");
+                }
                 conn.Close();
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"200\",\"msg\":\"用户绑定成功，等待审核\"}");
-                return strBuilder.ToString();
+                return;
+                
             }
             catch (Exception)
             {
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"1002\",\"msg\":\"用户绑定失败\"}");
-                return strBuilder.ToString();
-                throw;
+                Context.Response.Write("{\"code\":\"1002\",\"msg\":\"用户绑定失败\"}");
             }
         }
 
         [WebMethod(Description = "获取货主列表")]
-        public string getClientList(string license,int pageNum = 1,int pageSize = 10) {
+        public void getClientList(string license,int pageNum = 1,int pageSize = 10) {
             int totalCount = pageNum * pageSize;
             int startCount = (pageNum - 1) * pageSize;
             SqlConnection conn = new SqlConnection(connstr);
@@ -94,24 +102,24 @@ namespace HuadianWF
             if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "货主列表拉取成功");
-                return jsonData.ToString();
+                Context.Response.Write(jsonData);
             }
             else
             {
-                StringBuilder strBuilder = new StringBuilder();
+                string str = "";
                 if (pageNum == 1)
                 {
-                    strBuilder.Append("{\"code\":\"1004\",\"msg\":\"货主列表为空\"}");
+                    str = "{\"code\":\"1004\",\"msg\":\"货主列表为空\"}";
                 }
                 else {
-                    strBuilder.Append("{\"code\":\"1005\",\"msg\":\"已无更多货主信息\"}");
+                    str = "{\"code\":\"1005\",\"msg\":\"已无更多货主信息\"}";
                 }
-                
-                return strBuilder.ToString();
+
+                Context.Response.Write(str);
             }
         }
         [WebMethod(Description = "获取货主能买的产品")]
-        public string getGoodsListByClient(string clientName,string cardType) {
+        public void getGoodsListByClient(string clientName,string cardType) {
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
             string selectSql = "select 产品编号,产品名称 from av_jichuxinxi_huozhuhuixingbiao where 货主名称='"+clientName+"' and 卡类型='"+ cardType + "'";
@@ -125,18 +133,16 @@ namespace HuadianWF
             if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "产品列表拉取成功");
-                return jsonData.ToString();
+                Context.Response.Write(jsonData.ToString());
             }
             else
             {
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"1006\",\"msg\":\"货主可买商品为空\"}");
-                return strBuilder.ToString();
+                Context.Response.Write("{\"code\":\"1006\",\"msg\":\"货主可买商品为空\"}");
             }
         }
 
         [WebMethod(Description = "通过货品获取可选灰口")]
-        public string getGreyCastByGoods(string goodsNum) {
+        public void getGreyCastByGoods(string goodsNum) {
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
             string selectSql = "select * from xx_jichuxinxi_zaishouchanpin where chanpin_num = '"+ goodsNum + "'";
@@ -150,13 +156,11 @@ namespace HuadianWF
             if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "灰口列表拉取成功");
-                return jsonData.ToString();
+                Context.Response.Write(jsonData);
             }
             else
             {
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"1007\",\"msg\":\"无对应灰口\"}");
-                return strBuilder.ToString();
+                Context.Response.Write("{\"code\":\"1007\",\"msg\":\"无对应灰口\"}");
             }
         }
         [WebMethod(Description = "排队")]
@@ -166,7 +170,7 @@ namespace HuadianWF
         ///<param name="goodsName"></param>货品名称
         ///<param name="greyCastName"></param>灰口名称
         ///<param name="labelNum"></param>卡号
-        public string queueUp(string labelNum,string clientName,string goodsName,string greyCastName,string license,string driverName) {
+        public void queueUp(string labelNum,string clientName,string goodsName,string greyCastName,string license,string driverName) {
             SqlConnection conn = new SqlConnection(connstr);
             try
             {
@@ -221,18 +225,16 @@ namespace HuadianWF
                         returnStr = "{\"code\":\"1011\",\"msg\":\"排队失败,未知错误\"}";
                         break;
                 }
-                return returnStr;
+                Context.Response.Write(returnStr);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return e.Message;
-                //string returnStr = "{\"code\":\"1009\",\"msg\":\"排队失败，请联系管理员\"}";
-                //return returnStr;
+                Context.Response.Write("{\"code\":\"1009\",\"msg\":\"排队失败，请联系管理员\"}");
             }
         }
 
         [WebMethod(Description = "获取前方排队人数")]
-        public string getQueueNum(string goodsName,string greyCastName,string queueCode) {
+        public void getQueueNum(string goodsName,string greyCastName,string queueCode) {
 
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
@@ -247,13 +249,11 @@ namespace HuadianWF
             if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "前方排队人数获取成功");
-                return jsonData.ToString();
+                Context.Response.Write(jsonData);
             }
             else
             {
-                StringBuilder strBuilder = new StringBuilder();
-                strBuilder.Append("{\"code\":\"1014\",\"msg\":\"排队人数获取失败\"}");
-                return strBuilder.ToString();
+                Context.Response.Write("{\"code\":\"1014\",\"msg\":\"排队人数获取失败\"}");
             }
         }
     }

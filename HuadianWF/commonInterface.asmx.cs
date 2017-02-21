@@ -22,7 +22,7 @@ namespace HuadianWF
         public static string connstr = ConfigurationManager.ConnectionStrings["connectStr"].ConnectionString;
 
         [WebMethod(Description = "获取消息通知")]
-        public string HelloWorld(int pageNum,int pageSize)
+        public void HelloWorld(int pageNum,int pageSize)
         {
             int totalCount = pageNum * pageSize;
             int startCount = (pageNum - 1) * pageSize;
@@ -50,7 +50,7 @@ namespace HuadianWF
                     retStr = "{\"code\":\"-1\",\"msg\":\"已无更多消息通知\"}";
                 }
             }
-            return retStr;
+            Context.Response.Write(retStr);
         }
     }
 }

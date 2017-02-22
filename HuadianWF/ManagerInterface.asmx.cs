@@ -86,7 +86,7 @@ namespace HuadianWF
         public void getGreyCastPaiduiInfo() {
             string ret = "";
             SqlConnection conn = new SqlConnection(connstr);
-            string querySql = "select COUNT(*) as paiduiNum,灰口名称 as greyCastName from av_bangdanxinxi_paiduichaxun group by 灰口名称";
+            string querySql = "select COUNT(*) as paiduiNum,灰口名称 as greyCastName from av_bangdanxinxi_paiduichaxun group by 灰口名称 order by 灰口名称 desc";
             SqlCommand command = new SqlCommand(querySql, conn);
             SqlDataAdapter sda = new SqlDataAdapter();
             DataSet ds = new DataSet();
@@ -112,11 +112,11 @@ namespace HuadianWF
             Context.Response.Write(ret);
         }
 
-        [WebMethod(Description = "获取灰口排队详情")]
+        [WebMethod(Description = "获取灰口排队队列")]
         public void getGreyCastPaiduiDetail(string greyCastName) {
             string ret = "";
             SqlConnection conn = new SqlConnection(connstr);
-            string querySql = "select * from av_bangdanxinxi_paiduichaxun where 灰口名称 = '"+greyCastName+"' order by 排队编码 asc";
+            string querySql = "select 收货单位,产品名称,车牌号,排队状态,主键,司机 from av_bangdanxinxi_paiduichaxun where 灰口名称 = '"+greyCastName+"' order by 排队编码 asc";
             SqlCommand command = new SqlCommand(querySql, conn);
             SqlDataAdapter sda = new SqlDataAdapter();
             DataSet ds = new DataSet();
@@ -142,6 +142,36 @@ namespace HuadianWF
             }
             Context.Response.Write(ret);
 
+        }
+        [WebMethod(Description = "获取灰口排队详情")]
+        public void getPaiduiDetail(string key) {
+            string ret = "";
+            SqlConnection conn = new SqlConnection(connstr);
+            string querySql = "select * from av_bangdanxinxi_paiduichaxun where 主键 = '" + key + "'";
+            SqlCommand command = new SqlCommand(querySql, conn);
+            SqlDataAdapter sda = new SqlDataAdapter();
+            DataSet ds = new DataSet();
+            sda.SelectCommand = command;
+            try
+            {
+                conn.Open();
+                sda.SelectCommand.BeginExecuteNonQuery();
+                conn.Close();
+                sda.Fill(ds);
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "灰口排队详情获取成功");
+                }
+                else
+                {
+                    ret = "{\"code\":\"-1\",\"msg\":\"灰口排队详情获取失败\"}";
+                }
+            }
+            catch (Exception)
+            {
+                ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}"; ;
+            }
+            Context.Response.Write(ret);
         }
         [WebMethod(Description = "获取灰口列表")]
        

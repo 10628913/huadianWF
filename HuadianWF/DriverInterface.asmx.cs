@@ -50,19 +50,18 @@ namespace HuadianWF
                     return;
                 }
                 //deviceId校验成功，返回用户数据
-                string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "司机信息校验成功");
+                string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "司机信息获取成功");
                 Context.Response.Write(jsonData.ToString());
             }
             else {
                 //deviceId校验失败
-                Context.Response.Write("{\"code\":\"1001\",\"msg\":\"用户信息校验失败\"}");
+                Context.Response.Write("{\"code\":\"1001\",\"msg\":\"用户信息获取失败\"}");
             }
         }
 
         [WebMethod(Description = "用户绑定（sn）")]
         public void userComplete(string mobile, string sn) {
             SqlConnection conn = new SqlConnection(connstr);
-
             string updateSql = "update xx_yonghu_cheliangxinxi set sn = '" + sn + "' where dianhua = '" + mobile + "'";
             SqlCommand command = new SqlCommand(updateSql, conn);
 
@@ -70,12 +69,12 @@ namespace HuadianWF
             {
                 conn.Open();
                 int num = Convert.ToInt32(command.ExecuteNonQuery());
-                if (num > 0) {
-                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"用户绑定成功，等待审核\"}");
-                } else {
-                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"用户绑定失败\"}");
-                }
                 conn.Close();
+                if (num > 0) {
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"用户绑定成功\"}");
+                } else {
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"用户不存在!\"}");
+                }
                 return;
                 
             }

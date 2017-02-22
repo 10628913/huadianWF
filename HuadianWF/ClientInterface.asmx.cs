@@ -43,15 +43,20 @@ namespace HuadianWF
                 data.Fill(ds);
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
+                    string status = ds.Tables[0].Rows[0]["status"].ToString();
+                    if (status == "冻结") {
+                        Context.Response.Write("{\"code\":\"-1\",\"msg\":\"当前货主已被冻结\"}");
+                        return;
+                    }
                     //deviceId校验成功，返回用户数据
-                    string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "货主信息校验成功");
+                    string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "货主信息获取成功");
                     Context.Response.Write(jsonData.ToString());
                 }
                 else
                 {
                     //deviceId校验失败
                     StringBuilder strBuilder = new StringBuilder();
-                    strBuilder.Append("{\"code\":\"1001\",\"msg\":\"货主信息校验失败\"}");
+                    strBuilder.Append("{\"code\":\"-1\",\"msg\":\"货主信息获取失败,请进行手机验证\"}");
                     Context.Response.Write(strBuilder.ToString());
                 }
             }
@@ -74,9 +79,16 @@ namespace HuadianWF
             try
             {
                 conn.Open();
-                command.BeginExecuteNonQuery();
+                int num = command.ExecuteNonQuery();
                 conn.Close();
-                Context.Response.Write("{\"code\":\"200\",\"msg\":\"货主绑定成功，等待审核\"}");
+                if (num > 0)
+                {
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"货主绑定成功\"}");
+                }
+                else {
+                    Context.Response.Write("{\"code\":\"1002\",\"msg\":\"货主绑定失败\"}");
+                }
+               
             }
             catch (Exception)
             {
@@ -193,7 +205,7 @@ namespace HuadianWF
             Context.Response.Write(ret);
         }
 
-        [WebMethod(Description = "查询榜单(时间)")]
+        [WebMethod(Description = "查询磅单(时间)")]
         public void getBangdanHistory(int pageNum,int pageSize,string startTime,string endTime,string clientName) {
 
             int totalCount = pageNum * pageSize;
@@ -225,17 +237,17 @@ namespace HuadianWF
                 sqlDataAdapter.Fill(ds);
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "榜单信息获取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "磅单信息获取成功");
                 }
                 else
                 {
                     if (pageNum == 1)
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"无榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"无磅单信息\"}";
                     }
                     else
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多磅单信息\"}";
                     }
 
                 }
@@ -247,7 +259,7 @@ namespace HuadianWF
             Context.Response.Write(ret);
         }
 
-        [WebMethod(Description = "获取榜单详情")]
+        [WebMethod(Description = "获取磅单详情")]
         public void getBangdanDetail(string number) {
             string querySql = "select * from pd_xitong_bangdanxinxi where number = '"+number+"'";
             SqlConnection conn = new SqlConnection(connstr);
@@ -265,11 +277,11 @@ namespace HuadianWF
                 sqlDataAdapter.Fill(ds);
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "榜单信息获取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "磅单信息获取成功");
                 }
                 else
                 {
-                    ret = "{\"code\":\"-1\",\"msg\":\"榜单信息获取失败\"}";
+                    ret = "{\"code\":\"-1\",\"msg\":\"磅单信息获取失败\"}";
                 }
             }
             catch (Exception)

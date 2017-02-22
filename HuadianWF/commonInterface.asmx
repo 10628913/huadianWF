@@ -1,1 +1,1 @@
-﻿<%@ WebService Language="C#" CodeBehind="commonInterface.asmx.cs" Class="HuadianWF.commonInterface" %>
+﻿<%@ WebService Language="C#" CodeBehind="CommonInterface.asmx.cs" Class="HuadianWF.CommonInterface" %>

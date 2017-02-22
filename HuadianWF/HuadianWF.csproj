@@ -131,7 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ClientInterface.asmx" />
-    <Content Include="commonInterface.asmx" />
+    <Content Include="CommonInterface.asmx" />
     <Content Include="DriverInterface.asmx" />
     <Content Include="JsonUtil.asmx" />
     <Content Include="bin\cn.jpush.api.dll" />
@@ -150,7 +150,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Appintface.asmx" />
+    <Content Include="PushInterface.asmx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -160,16 +160,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Appintface.asmx.cs">
-      <DependentUpon>Appintface.asmx</DependentUpon>
+    <Compile Include="PushInterface.asmx.cs">
+      <DependentUpon>PushInterface.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ClientInterface.asmx.cs">
       <DependentUpon>ClientInterface.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="commonInterface.asmx.cs">
-      <DependentUpon>commonInterface.asmx</DependentUpon>
+    <Compile Include="CommonInterface.asmx.cs">
+      <DependentUpon>CommonInterface.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DriverInterface.asmx.cs">

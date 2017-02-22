@@ -20,7 +20,7 @@ namespace HuadianWF
     [System.ComponentModel.ToolboxItem(false)]
     // 若要允许使用 ASP.NET AJAX 从脚本中调用此 Web 服务，请取消注释以下行。 
     // [System.Web.Script.Services.ScriptService]
-    public class Appintface : System.Web.Services.WebService
+    public class PushInterface : System.Web.Services.WebService
     {
 
         [WebMethod()]
@@ -63,45 +63,10 @@ namespace HuadianWF
             return decryptedAccountNumber + "has used" + decryptedAmount.ToString();
 
         }
-
         [WebMethod()]
-        public string getuser(byte[] username)
-        { 
-            RSACryptoServiceProvider crypt = GetKeyFromState();
-            string deusername;
-            System.Text.UnicodeEncoding ncd = new System.Text.UnicodeEncoding();
-            deusername = ncd.GetString(crypt.Decrypt(username, false));
-            return deusername;
-        }
-        [WebMethod()]
-        public string test() {
-            //数据库连接串
-            string connStr = ConfigurationManager.ConnectionStrings["connectStr"].ConnectionString;
-            //数据库连接对象
-            SqlConnection myConn = new SqlConnection(connStr);
-            
-            string sql = "select * from xx_xitong_user";
-            //数据适配器
-            SqlDataAdapter dataAdapter = new SqlDataAdapter();
-            SqlCommand sqlCommand = new SqlCommand(sql,myConn);
-            dataAdapter.SelectCommand = sqlCommand;
-
-            DataSet dataSet = new DataSet();
-            myConn.Open();
-            dataAdapter.SelectCommand.BeginExecuteNonQuery();
-            myConn.Close();
-            dataAdapter.Fill(dataSet);
-            if (dataSet.Tables.Count > 0  && dataSet.Tables[0].Rows.Count > 0) {
-                string jsonData = JsonUtil.ToJson(dataSet.Tables[0],"data","200","成功");
-                return jsonData.ToString();
-            }
-
-            return "";
-        }
-        [WebMethod()]
-        public void testJpush()
+        public void doPush(string tag,string title, string content)
         {
-            JPushApi.push();
+            JPushApi.push(tag,title,content);
 
 
         }

@@ -55,7 +55,7 @@ namespace HuadianWF
             }
             else {
                 //deviceId校验失败
-                Context.Response.Write("{\"code\":\"1001\",\"msg\":\"用户信息获取失败\"}");
+                Context.Response.Write("{\"code\":\"1001\",\"msg\":\"用户信息获取失败,请进行手机验证\"}");
             }
         }
 

@@ -26,11 +26,11 @@ namespace HuadianWF
         public static String app_key = ConfigurationManager.AppSettings["jush_app_key"];
         public static String master_secret = ConfigurationManager.AppSettings["jpush_master_secret"];
 
-        public static void push()
+        public static void push(string tag,string alert,string title)
         {
            System.Diagnostics.Debug.Write("*****开始发送******");
             JPushClient client = new JPushClient(app_key, master_secret);
-
+            /**
             PushPayload payload = PushObject_All_All_Alert();
             try
             {
@@ -83,11 +83,11 @@ namespace HuadianWF
             {
                System.Diagnostics.Debug.Write(e.Message);
             }
-
-            PushPayload payload_alias = PushObject_all_alias_alert();
+            */
+            PushPayload tags = PushObject_Android_Tag_AlertWithTitle(tag,alert,title);
             try
             {
-                var result = client.SendPush(payload_alias);
+                var result = client.SendPush(tags);
                 //由于统计数据并非非是即时的,所以等待一小段时间再执行下面的获取结果方法
                 System.Threading.Thread.Sleep(10000);
                 //如需查询上次推送结果执行下面的代码
@@ -132,13 +132,13 @@ namespace HuadianWF
             pushPayload_alias.notification = new Notification().setAlert(ALERT);
             return pushPayload_alias;
         }
-        public static PushPayload PushObject_Android_Tag_AlertWithTitle()
+        public static PushPayload PushObject_Android_Tag_AlertWithTitle(string tag,string title,string alert)
         {
             PushPayload pushPayload = new PushPayload();
 
             pushPayload.platform = Platform.android();
-            pushPayload.audience = Audience.s_tag("tag1"); 
-            pushPayload.notification =  Notification.android(ALERT,TITLE);
+            pushPayload.audience = Audience.s_tag(tag); 
+            pushPayload.notification =  Notification.android(alert,title);
             return pushPayload;
         }
         public static PushPayload PushObject_android_and_ios()

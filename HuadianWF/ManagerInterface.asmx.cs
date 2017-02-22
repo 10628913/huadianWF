@@ -138,7 +138,7 @@ namespace HuadianWF
             }
             catch (Exception)
             {
-                ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}"; ;
+                ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}";
             }
             Context.Response.Write(ret);
 
@@ -248,8 +248,8 @@ namespace HuadianWF
         ///<param name="shifoupaidui">灰口类型</param>
         ///<param name="shifoukeyipadui">是否可以排队</param>
         ///<param name="shifoujinchang">是否可以进场</param>
-        public void updateGreyCastInfo(int number,string greyCastNum, string greyCastName, string kongzhiqiNum,
-            string labelType, string max, string min, string shifoupaidui, string shifoukeyipaidui, string shifoujinchang)
+        public void updateGreyCastInfo(int number,string greyCastNum = "", string greyCastName = "", string kongzhiqiNum = "",
+            string labelType = "", string max = "", string min = "", string shifoupaidui = "", string shifoukeyipaidui = "", string shifoujinchang = "")
         {
 
 
@@ -327,7 +327,7 @@ namespace HuadianWF
             }
         }
 
-        [WebMethod(Description = "查询榜单(时间)")]
+        [WebMethod(Description = "查询磅单(时间)")]
         public void getBangdanHistory(int pageNum, int pageSize, string startTime, string endTime)
         {
 
@@ -361,17 +361,17 @@ namespace HuadianWF
                 sqlDataAdapter.Fill(ds);
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "榜单信息获取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "磅单信息获取成功");
                 }
                 else
                 {
                     if (pageNum == 1)
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"无榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"无磅单信息\"}";
                     }
                     else
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多磅单信息\"}";
                     }
 
                 }
@@ -383,7 +383,7 @@ namespace HuadianWF
             Context.Response.Write(ret);
         }
 
-        [WebMethod(Description = "获取榜单详情")]
+        [WebMethod(Description = "获取磅单详情")]
         public void getBangdanDetail(string number)
         {
             string querySql = "select * from pd_xitong_bangdanxinxi where number = '" + number + "'";
@@ -402,11 +402,11 @@ namespace HuadianWF
                 sqlDataAdapter.Fill(ds);
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "榜单信息获取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "磅单信息获取成功");
                 }
                 else
                 {
-                    ret = "{\"code\":\"-1\",\"msg\":\"榜单信息获取失败\"}";
+                    ret = "{\"code\":\"-1\",\"msg\":\"磅单信息获取失败\"}";
                 }
             }
             catch (Exception)
@@ -471,7 +471,7 @@ namespace HuadianWF
             int totalCount = pageNum * pageSize;
             int startCount = (pageNum - 1) * pageSize;
 
-            string sql = "select number,label_siji,label_chepai,status,huixing_name,huozhu_name from (SELECT TOP " + totalCount + " ROW_NUMBER() OVER(ORDER BY number desc) AS ROWID,* FROM pd_xitong_bangdanxinxi where status != '完成' and status != '重新排队') as temp1 where ROWID > " + startCount;
+            string sql = "select number,paidui_num,label_num,label_siji,label_chepai,status,huixing_name,huozhu_name from (SELECT TOP " + totalCount + " ROW_NUMBER() OVER(ORDER BY number desc) AS ROWID,* FROM pd_xitong_bangdanxinxi where status != '已完成' and status != '重新排队') as temp1 where ROWID > " + startCount;
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sda = new SqlDataAdapter();
             SqlCommand command = new SqlCommand(sql, conn);
@@ -486,16 +486,16 @@ namespace HuadianWF
                 string ret = "";
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "可挂起榜单列表拉取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "可挂起磅单列表拉取成功");
                 }
                 else
                 {
                     if (pageNum == 1)
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"暂无可挂起榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"暂无可挂起磅单信息\"}";
                     }
                     else {
-                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多可挂起榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多可挂起磅单信息\"}";
                     }
                 }
                 Context.Response.Write(ret);
@@ -511,7 +511,7 @@ namespace HuadianWF
             int totalCount = pageNum * pageSize;
             int startCount = (pageNum - 1) * pageSize;
 
-            string sql = "select number,label_siji,label_chepai,status,huixing_name,huozhu_name from (SELECT TOP " + totalCount + " ROW_NUMBER() OVER(ORDER BY number desc) AS ROWID,* FROM pd_xitong_bangdanxinxi where status = '挂起') as temp1 where ROWID > " + startCount;
+            string sql = "select number,label_siji,paidui_num,label_num,label_chepai,status,huixing_name,huozhu_name from (SELECT TOP " + totalCount + " ROW_NUMBER() OVER(ORDER BY number desc) AS ROWID,* FROM pd_xitong_bangdanxinxi where status = '挂起') as temp1 where ROWID > " + startCount;
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sda = new SqlDataAdapter();
             SqlCommand command = new SqlCommand(sql, conn);
@@ -526,17 +526,17 @@ namespace HuadianWF
                 string ret = "";
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
-                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "可解挂榜单列表拉取成功");
+                    ret = JsonUtil.ToJson(ds.Tables[0], "data", "200", "可解挂磅单列表拉取成功");
                 }
                 else
                 {
                     if (pageNum == 1)
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"暂无可解挂榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"暂无可解挂磅单信息\"}";
                     }
                     else
                     {
-                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多可解挂榜单信息\"}";
+                        ret = "{\"code\":\"-1\",\"msg\":\"已无更多可解挂磅单信息\"}";
                     }
                 }
                 Context.Response.Write(ret);
@@ -546,7 +546,7 @@ namespace HuadianWF
                 Context.Response.Write("{\"code\":\"404\",\"msg\":\"请求错误\"}");
             }
         }
-        [WebMethod(Description = "车辆榜单挂起")]
+        [WebMethod(Description = "车辆磅单挂起")]
         public void bangdanGuaqi(int number) {
             string sql = "update pd_xitong_bangdanxinxi set guaqiqian_status = status,status = '挂起',gq_time1 = '"+DateTime.Now+"' where number = "+number;
             SqlConnection conn = new SqlConnection(connstr);
@@ -557,11 +557,11 @@ namespace HuadianWF
                 int num = command.ExecuteNonQuery();
                 if (num > 0)
                 {
-                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"榜单挂起成功\"}");
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"磅单挂起成功\"}");
                 }
                 else
                 {
-                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"榜单挂起失败\"}");
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"磅单挂起失败\"}");
                 }
                 conn.Close();
 
@@ -572,7 +572,7 @@ namespace HuadianWF
             }
         }
 
-        [WebMethod(Description = "车辆榜单解挂")]
+        [WebMethod(Description = "车辆磅单解挂")]
         ///<summary></summary>
         ///<param name="type">1:解挂到挂起前状态2:解挂为重新排队</param>
         public void bangdanJiegua(int number,int type)
@@ -596,11 +596,11 @@ namespace HuadianWF
                 int num = command.ExecuteNonQuery();
                 if (num > 0)
                 {
-                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"榜单解挂成功\"}");
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"磅单解挂成功\"}");
                 }
                 else
                 {
-                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"榜单解挂失败\"}");
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"磅单解挂失败\"}");
                 }
                 conn.Close();
 

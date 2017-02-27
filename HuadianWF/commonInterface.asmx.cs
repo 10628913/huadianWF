@@ -53,6 +53,7 @@ namespace HuadianWF
                 }
             }
             Context.Response.Write(retStr);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         [WebMethod(Description = "获取通知详情")]
         public void getMessageDetail(int id) {
@@ -72,15 +73,18 @@ namespace HuadianWF
                 {
                     string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "消息详情获取成功");
                     Context.Response.Write(jsonData);
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
                 else
                 {
                     Context.Response.Write("{\"code\":\"1004\",\"msg\":\"货主列表为空\"}");
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
             }
             catch (Exception)
             {
                 Context.Response.Write("{\"code\":\"404\",\"msg\":\"请求错误\"}");
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
     }

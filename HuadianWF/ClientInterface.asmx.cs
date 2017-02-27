@@ -46,11 +46,12 @@ namespace HuadianWF
                     string status = ds.Tables[0].Rows[0]["status"].ToString();
                     if (status == "冻结") {
                         Context.Response.Write("{\"code\":\"-1\",\"msg\":\"当前货主已被冻结\"}");
-                        return;
+                        HttpContext.Current.ApplicationInstance.CompleteRequest();
                     }
                     //deviceId校验成功，返回用户数据
                     string jsonData = JsonUtil.ToJson(ds.Tables[0], "data", "200", "货主信息获取成功");
                     Context.Response.Write(jsonData.ToString());
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
                 else
                 {
@@ -58,12 +59,14 @@ namespace HuadianWF
                     StringBuilder strBuilder = new StringBuilder();
                     strBuilder.Append("{\"code\":\"-1\",\"msg\":\"货主信息获取失败,请进行手机验证\"}");
                     Context.Response.Write(strBuilder.ToString());
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
             }
             catch (Exception)
             {
 
                 Context.Response.Write("{\"code\":\"404\",\"msg\":\"请求错误\"}");
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
             
         }
@@ -84,15 +87,18 @@ namespace HuadianWF
                 if (num > 0)
                 {
                     Context.Response.Write("{\"code\":\"200\",\"msg\":\"货主绑定成功\"}");
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
                 else {
                     Context.Response.Write("{\"code\":\"1002\",\"msg\":\"货主绑定失败\"}");
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
                 }
                
             }
             catch (Exception)
             {
                 Context.Response.Write("{\"code\":\"1002\",\"msg\":\"货主绑定失败\"}");
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
 
@@ -126,6 +132,7 @@ namespace HuadianWF
                 ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}";
             }
             Context.Response.Write(ret);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod(Description = "获取排队信息")]
@@ -159,6 +166,7 @@ namespace HuadianWF
                 ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}";
             }
             Context.Response.Write(ret);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod(Description = "获取车辆拉灰详情(分页)")]
@@ -203,6 +211,7 @@ namespace HuadianWF
             }
             //Context.Response.Write(querySql);
             Context.Response.Write(ret);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod(Description = "查询磅单(时间)")]
@@ -257,6 +266,7 @@ namespace HuadianWF
                 ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}";
             }
             Context.Response.Write(ret);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod(Description = "获取磅单详情")]
@@ -289,6 +299,7 @@ namespace HuadianWF
                 ret = "{\"code\":\"404\",\"msg\":\"请求错误\"}";
             }
             Context.Response.Write(ret);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
     }
 }

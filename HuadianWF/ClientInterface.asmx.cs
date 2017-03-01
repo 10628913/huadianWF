@@ -158,7 +158,7 @@ namespace HuadianWF
                 }
                 else
                 {
-                    ret = "{\"code\":\"-1\",\"msg\":\"排队信息拉取失败\"}";
+                    ret = "{\"code\":\"-1\",\"msg\":\"暂无排队信息\"}";
                 }
             }
             catch (Exception)

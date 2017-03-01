@@ -87,5 +87,30 @@ namespace HuadianWF
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
+        [WebMethod(Description = "发布消息通知")]
+        public void publishMessage(string uid,string title,string content,int message_status) {
+            string sql = "insert into xx_xitongxiaoxi (uid,message_title,message_content,message_addtime,message_status) values('" + uid + "','" + title + "','" + content + "','" + DateTime.Now + "','" + message_status + "')";
+            SqlConnection conn = new SqlConnection(connstr);
+            SqlCommand command = new SqlCommand(sql,conn);
+            try
+            {
+                conn.Open();
+                int num = command.ExecuteNonQuery();
+                conn.Close();
+                if (num > 0) {
+                    Context.Response.Write("{\"code\":\"200\",\"msg\":\"消息发布成功\"}");
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
+                }else
+                {
+                    Context.Response.Write("{\"code\":\"-1\",\"msg\":\"消息发布失败\"}");
+                    HttpContext.Current.ApplicationInstance.CompleteRequest();
+                }
+            }
+            catch (Exception)
+            {
+                Context.Response.Write("{\"code\":\"404\",\"msg\":\"请求错误\"}");
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
+            }
+        }
     }
 }

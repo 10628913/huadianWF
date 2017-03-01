@@ -177,7 +177,7 @@ namespace HuadianWF
             pushPayload.notification =  Notification.android(alert,title);
             return pushPayload;
         }
-        public static PushPayload PushObject_android_and_ios(string tags,string title,string content,string extra)
+        public static PushPayload PushObject_android_and_ios(string tags,string title,string content,string type)
         {
             PushPayload pushPayload = new PushPayload();
             pushPayload.platform = Platform.android_ios();
@@ -188,10 +188,13 @@ namespace HuadianWF
             //notification.IosNotification = new IosNotification();
             //notification.IosNotification.incrBadge(1);
             //notification.IosNotification.AddExtra("extra_key", "extra_value");
-            notification.AndroidNotification.AddExtra("data",extra);
+            notification.AndroidNotification.AddExtra("type",type);
 
-            pushPayload.notification = notification.Check(); 
-      
+            pushPayload.notification = notification.Check();
+
+            pushPayload.message = Message.content(content).AddExtras("type", type);
+
+            
 
             return pushPayload;
         }
@@ -202,7 +205,7 @@ namespace HuadianWF
             pushPayload.audience = Audience.s_tag_and("tag1", "tag_all");
             var notification = new Notification();
             notification.IosNotification = new IosNotification().setAlert(ALERT).setBadge(5).setSound("happy").AddExtra("from","JPush");
-
+            notification.AndroidNotification = new AndroidNotification().setAlert("666").setTitle("777");
             pushPayload.notification = notification;
             pushPayload.message = Message.content(MSG_CONTENT);
             return pushPayload;

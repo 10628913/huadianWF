@@ -78,10 +78,17 @@ namespace HuadianWF
 
 
         [WebMethod(Description = "获取灰口排队信息")]
-        public  void getGreyCastPaiduiInfo() {
+        public  void getGreyCastPaiduiInfo(string bumen) {
+            
             string ret = "";
             SqlConnection conn = new SqlConnection(connstr);
-            string querySql = "select COUNT(*) as paiduiNum,灰口名称 as greyCastName from av_bangdanxinxi_paiduichaxun group by 灰口名称 order by 灰口名称 desc";
+            string querySql = "select COUNT(*) as paiduiNum,灰口名称 as greyCastName from av_bangdanxinxi_paiduichaxun where 1=1 ";
+            if (!string.IsNullOrEmpty(bumen))
+            {
+                bumen = "'"+bumen.Replace(" ", "','")+"'";
+                querySql += " and bumen in ("+bumen+")";
+            }
+            querySql += " group by 灰口名称 order by 灰口名称 desc";
             SqlCommand command = new SqlCommand(querySql, conn);
             SqlDataAdapter sda = new SqlDataAdapter();
             DataSet ds = new DataSet();
@@ -109,10 +116,16 @@ namespace HuadianWF
         }
 
         [WebMethod(Description = "获取灰口排队队列")]
-        public void getGreyCastPaiduiDetail(string greyCastName) {
+        public void getGreyCastPaiduiDetail(string greyCastName,string bumen) {
             string ret = "";
             SqlConnection conn = new SqlConnection(connstr);
-            string querySql = "select 收货单位,产品名称,车牌号,排队状态,主键,司机 from av_bangdanxinxi_paiduichaxun where 灰口名称 = '"+greyCastName+"' order by 排队编码 asc";
+            string querySql = "select 收货单位,产品名称,车牌号,排队状态,主键,司机 from av_bangdanxinxi_paiduichaxun where 灰口名称 = '"+greyCastName+"'";
+            if (!string.IsNullOrEmpty(bumen))
+            {
+                bumen = "'" + bumen.Replace(" ", "','") + "'";
+                querySql += " and bumen in (" + bumen + ")";
+            }
+            querySql += " order by 排队编码 asc";
             SqlCommand command = new SqlCommand(querySql, conn);
             SqlDataAdapter sda = new SqlDataAdapter();
             DataSet ds = new DataSet();
@@ -331,13 +344,13 @@ namespace HuadianWF
         }
 
         [WebMethod(Description = "查询磅单(时间)")]
-        public void getBangdanHistory(int pageNum, int pageSize, string startTime, string endTime)
+        public void getBangdanHistory(int pageNum, int pageSize, string startTime, string endTime,string clientName,string greyCastName,string goodsName)
         {
 
             int totalCount = pageNum * pageSize;
             int startCount = (pageNum - 1) * pageSize;
             StringBuilder sb = new StringBuilder();
-            sb.Append("select * from (select top " + totalCount + " ROW_NUMBER() over(order by pd_time) as rowid,* from pd_xitong_bangdanxinxi where 1=1");
+            sb.Append("select * from (select top " + totalCount + " ROW_NUMBER() over(order by pd_time desc) as rowid,* from pd_xitong_bangdanxinxi where 1=1 ");
             if (!string.IsNullOrEmpty(startTime))
             {
                 sb.Append(" and pd_time > '" + startTime + "'");
@@ -346,7 +359,19 @@ namespace HuadianWF
             {
                 sb.Append(" and pd_time < '" + endTime + "'");
             }
-            sb.Append(") as temp1 where rowid>" + startCount);
+            if (!string.IsNullOrEmpty(clientName))
+            {
+                sb.Append(" and huozhu_name = '" + clientName + "'");
+            }
+            if (!string.IsNullOrEmpty(greyCastName))
+            {
+                sb.Append(" and huixing_name = '" + greyCastName + "'");
+            }
+            if (!string.IsNullOrEmpty(endTime))
+            {
+                sb.Append(" and chanpin_name < '" + goodsName + "'");
+            }
+            sb.Append(" ) as temp1 where rowid > " + startCount);
             string querySql = sb.ToString();
             //Context.Response.Write(querySql);
             SqlConnection conn = new SqlConnection(connstr);

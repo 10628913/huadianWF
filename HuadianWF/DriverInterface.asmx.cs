@@ -315,7 +315,7 @@ namespace HuadianWF
 
             SqlConnection conn = new SqlConnection(connstr);
             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
-            string selectSql = "select COUNT(*) as queue_count from av_bangdanxinxi_paiduichaxun where 产品名称='"+goodsName+"' and 灰口名称='"+greyCastName+"' and 排队状态='排队' and 排队编码<'"+queueCode+"'";
+            string selectSql = "select COUNT(*) as queue_count from av_bangdanxinxi_paiduichaxun where 产品名称='"+goodsName+"' and 灰口名称='"+greyCastName+"' and 排队状态='等待' and 排队编码<'"+queueCode+"'";
             SqlCommand command = new SqlCommand(selectSql, conn);
             DataSet ds = new DataSet();
             sqlDataAdapter.SelectCommand = command;
@@ -338,7 +338,7 @@ namespace HuadianWF
         [WebMethod(Description = "获取排队信息")]
         public void getQueueInfo(string license)
         {
-            string sql = "select * from av_bangdanxinxi_paiduichaxun where 车牌号='"+license+"'";
+            string sql = "select top 1 * from av_bangdanxinxi_paiduichaxun where 车牌号='"+license+"' order by 主键 desc";
             SqlConnection conn = new SqlConnection(connstr);
             SqlCommand command = new SqlCommand(sql,conn);
 
@@ -412,7 +412,7 @@ namespace HuadianWF
         
         }
         [WebMethod(Description = "重新排队")]
-        public void retryQueue(string labelNum, string clientName, string goodsName, string greyCastName) {
+        public void retryQueue(string labelNum) {
             //首先获取原排队信息
             string querySql = "select Top 1 number from pd_xitong_bangdanxinxi where label_num = '" + labelNum + "' and status != '已完成' and status != '重新排队' order by number desc";
             SqlConnection conn = new SqlConnection(connstr);
